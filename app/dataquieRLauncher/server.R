@@ -114,6 +114,9 @@ function(input, output, session) {
     e$progress <- Progress$new(min = 0, max = 100)
     # Hide the x for the progress notification
     shinyjs::runjs('$(".shiny-notification-close").hide()')
+    e$msg_shown <- list()
+    e$wrn_shown <- list()
+    e$err_shown <- list()
     e$progress$set(message = "Perparing computation...")
     e$mtm <- ""
     x <- callr::r_bg(
@@ -231,24 +234,36 @@ function(input, output, session) {
   observeEvent(update_needed(), {
     if (file.exists(file.path(d, "messages"))) {
       try(unlink(file.path(d, "messages_shown"), force = TRUE), silent = TRUE)
-      nmsg <- paste(readLines(file.path(d, "messages")), collapse = "\n")
+      nmsg <- readLines(file.path(d, "messages"))
       shinyjs::logjs(nmsg)
+      nmsg <- unique(nmsg)
+      nmsg <- nmsg[!(nmsg %in% names(e$msg_shown))]
+      e$msg_shown[nmsg] <- TRUE
+      nmsg <- paste(nmsg, collapse = "\n")
       shiny::showNotification(nmsg, duration = 2, type = "message")
       file.rename(file.path(d, "messages"),
                   file.path(d, "messages_shown"))
     }
     if (file.exists(file.path(d, "warnings"))) {
       try(unlink(file.path(d, "warnings_shown"), force = TRUE), silent = TRUE)
-      warnmsg <- paste(readLines(file.path(d, "warnings")), collapse = "\n")
+      warnmsg <- readLines(file.path(d, "warnings"))
       shinyjs::logjs(warnmsg)
-      shiny::showNotification(warnmsg, duration = 20, type = "warning") # TODO: Avoid redundant warnings displayed.
+      warnmsg <- unique(warnmsg)
+      warnmsg <- warnmsg[!(warnmsg %in% names(e$wrn_shown))]
+      e$wrn_shown[warnmsg] <- TRUE
+      warnmsg <- paste(warnmsg, collapse = "\n")
+      shiny::showNotification(warnmsg, duration = 20, type = "warning")
       file.rename(file.path(d, "warnings"),
                   file.path(d, "warnings_shown"))
     }
     if (file.exists(file.path(d, "error"))) {
       try(unlink(file.path(d, "error_shown"), force = TRUE), silent = TRUE)
-      errmsg <- paste(readLines(file.path(d, "error")), collapse = "\n")
+      errmsg <- readLines(file.path(d, "error"))
       shinyjs::logjs(errmsg)
+      errmsg <- unique(errmsg)
+      errmsg <- errmsg[!(errmsg %in% names(e$err_shown))]
+      e$err_shown[errmsg] <- TRUE
+      errmsg <- paste(errmsg, collapse = "\n")
       shiny::showNotification(errmsg, duration = NULL, type = "error")
       file.rename(file.path(d, "error"),
                   file.path(d, "error_shown"))
