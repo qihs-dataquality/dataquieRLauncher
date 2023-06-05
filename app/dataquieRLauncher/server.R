@@ -241,7 +241,7 @@ function(input, output, session) {
       try(unlink(file.path(d, "warnings_shown"), force = TRUE), silent = TRUE)
       warnmsg <- paste(readLines(file.path(d, "warnings")), collapse = "\n")
       shinyjs::logjs(warnmsg)
-      shiny::showNotification(warnmsg, duration = NULL, type = "warning")
+      shiny::showNotification(warnmsg, duration = 20, type = "warning") # TODO: Avoid redundant warnings displayed.
       file.rename(file.path(d, "warnings"),
                   file.path(d, "warnings_shown"))
     }
