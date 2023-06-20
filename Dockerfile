@@ -21,6 +21,9 @@ RUN R -e "install.packages(c('shiny.info', 'shinyjs', 'callr', 'htmltools', 'plu
 RUN R -e "install.packages(c('DT'), repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('dataquieR', dependencies = TRUE, repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('markdown', repos='https://cloud.r-project.org/')"
+
+RUN apt-get update && apt-get install -y \
+    libmagick++-dev
 RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
 
 
