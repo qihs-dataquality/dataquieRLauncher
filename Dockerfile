@@ -21,6 +21,7 @@ RUN R -e "install.packages(c('shiny.info', 'shinyjs', 'callr', 'htmltools', 'plu
 RUN R -e "install.packages(c('DT'), repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('dataquieR', dependencies = TRUE, repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('markdown', repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
 
 
 COPY dataquieR.tar.gz /root/
