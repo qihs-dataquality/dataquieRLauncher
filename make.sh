@@ -4,4 +4,4 @@ if [ /Users/struckmanns/git/gitlab/QualityIndicatorFunctions/QualityIndicatorFun
     R -e 'devtools::build("/Users/struckmanns/git/gitlab/QualityIndicatorFunctions/QualityIndicatorFunctions/", manual = TRUE, path = "dataquieR.tar.gz")' ||
       exit -1
 fi
-docker build -t struckmann/dataquier-2-shiny .
+docker build -t struckmann/dataquier-2-shiny --progress plain .
