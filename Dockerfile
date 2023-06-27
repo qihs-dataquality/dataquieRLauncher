@@ -26,6 +26,14 @@ RUN apt-get update && apt-get install -y \
     libmagick++-dev
 RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
 
+RUN apt-get update && apt-get install -y \
+    libudunits2-dev
+RUN R -e "install.packages('units', repos='https://cloud.r-project.org/')"
+
+RUN apt-get update && apt-get install -y \
+    tcl-dev tk-dev
+RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
+
 
 COPY dataquieR.tar.gz /root/
 RUN R CMD INSTALL /root/dataquieR.tar.gz
