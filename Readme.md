@@ -39,42 +39,31 @@ mostly. You should configure your Docker to allow at least 6 GBytes of RAM
 by the container to compute `dataquieR`'s example reports.
 
 The launcher underlies the same license conditions as the `dataquieR` package,
-i.e.,	the "BSD 2-clause license", see [below](#license).
+i.e.,	the "BSD 2-clause license", see the file `LICENSE` in this repository.
 
 # Autobuilds
 
-Autobuilds will be enabled, once the [Dockerfile](https://gitlab.com/libreumg/internal/dataquierlauncher/-/blob/master/Dockerfile) becomes publicly available, planned for the last quarter of 2023 as of writing
+Autobuilds will be enabled, once the [Dockerfile](https://github.com/qihs-dataquality/dataquieRLauncher/blob/main/Dockerfile) becomes publicly available, planned for the last quarter of 2023 as of writing
 this (July, 20th 2023).
 
-# License
+--------------
 
-```
-Based on http://opensource.org/licenses/BSD-2-Clause
+# Build Pipeline
 
-Copyright (c) 2017-2023, University Medicine Greifswald, Greifswald, GERMANY.
+For building, we use `./make.sh && ./push.sh`.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
+# `ShinyProxy (external tool)`
 
-    Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
+See https://www.shinyproxy.io/ for details on this tool created by Open Analytics NV.
 
-    Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in
-    the documentation and/or other materials provided with the
-    distribution.
+For adding `dataquieR 2.0.1` to a `ShinyProxy` server, add something like below to
+`application.yml`:
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+```yaml
+    - id: dataquieR2
+      display-name: dataquieR 2.0.1
+      description: Run Data Quality Assessments
+      container-cmd: ["R", "-e", "shiny::runApp('/root/app/dataquieRLauncher')"]
+      container-image: dataquality/dataquier:2.0.1_0.1.2
+      access-groups: [developers]
 ```
