@@ -30,9 +30,8 @@ Then navigate your browser to
 http://localhost:3838/
 
 The image does not use TLS and it uses the port 3838 internally. You can find
-the image sources at https://gitlab.com/libreumg/internal/dataquierlauncher
-(not yet published) and the R package is hosted at 
-https://gitlab.com/libreumg/dataquier.
+the image sources at https://github.com/qihs-dataquality/dataquieRLauncher and 
+the R package is hosted at https://gitlab.com/libreumg/dataquier.
 
 The RAM usage of the image depends on the size of the assessed data files, 
 mostly. You should configure your Docker to allow at least 6 GBytes of RAM
