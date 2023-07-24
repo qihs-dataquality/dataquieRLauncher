@@ -58,6 +58,6 @@ For adding `dataquieR 2.0.1` to a `shinyproxy` server, add something like below 
       display-name: dataquieR 2.0.1
       description: Run Data Quality Assessments
       container-cmd: ["R", "-e", "shiny::runApp('/root/app/dataquieRLauncher')"]
-      container-image: packages.ship-med.uni-greifswald.de:56789/ship_docker/struckmann/dataquier-2-shiny:latest
+      container-image: dataquality/dataquier:latest
       access-groups: [developers]
 ```
