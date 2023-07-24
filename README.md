@@ -41,11 +41,6 @@ by the container to compute `dataquieR`'s example reports.
 The launcher underlies the same license conditions as the `dataquieR` package,
 i.e.,	the "BSD 2-clause license", see [below](#license).
 
-# Autobuilds
-
-Autobuilds will be enabled, once the [Dockerfile](https://gitlab.com/libreumg/internal/dataquierlauncher/-/blob/master/Dockerfile) becomes publicly available, planned for the last quarter of 2023 as of writing
-this (July, 20th 2023).
-
 # License
 
 ```
