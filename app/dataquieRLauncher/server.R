@@ -71,7 +71,7 @@ function(input, output, session) {
         bn <- basename(d)
         shiny::showNotification("On Windows, I cannot give the report folder in the zip file a nice name")
       }
-      report_files <- file.path(bn, list.files(bn))
+      report_files <- file.path(bn, list.files(bn, all.files = TRUE, recursive = TRUE, no.. = TRUE))
       zip(zipfile = file, files = report_files)
     },
     contentType = "application/zip"
