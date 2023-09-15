@@ -33,10 +33,10 @@ function(input, output, session) {
                 pattern = "tmp_rep_dir_")
   dir.create(d)
 
-  cat("No Report to Display", file = file.path(d, "report.html"))
+  cat("No Report to Display", file = file.path(d, "index.html"))
 
   e <- new.env(parent = emptyenv())
-  e$mtm <- as.character(file.mtime(file.path(d, "report.html")))
+  e$mtm <- as.character(file.mtime(file.path(d, "index.html")))
 
   rx <- NULL
 
@@ -71,7 +71,7 @@ function(input, output, session) {
         bn <- basename(d)
         shiny::showNotification("On Windows, I cannot give the report folder in the zip file a nice name")
       }
-      report_files <- file.path(bn, list.files(bn))
+      report_files <- file.path(bn, list.files(bn, all.files = TRUE, recursive = TRUE, no.. = TRUE))
       zip(zipfile = file, files = report_files)
     },
     contentType = "application/zip"
@@ -221,8 +221,8 @@ function(input, output, session) {
       x <- TRUE
     }
 
-    x <- x && file.exists(file.path(d, "report.html")) &&
-      e$mtm != as.character(file.mtime(file.path(d, "report.html")))
+    x <- x && file.exists(file.path(d, "index.html")) &&
+      e$mtm != as.character(file.mtime(file.path(d, "index.html")))
 
     return(x)
   })
@@ -281,10 +281,10 @@ function(input, output, session) {
     if (update_needed()) {
       # render the background process message to the UI
       output$report <- shiny::renderUI({
-        e$mtm <- as.character(file.mtime(file.path(d, "report.html")))
+        e$mtm <- as.character(file.mtime(file.path(d, "index.html")))
         htmltools::tags$iframe(
           style = "width: 100vw; height: calc(100vh - 130px); border: 0;",
-          src = file.path(basename(d), "report.html")
+          src = file.path(basename(d), "index.html")
         ) # https://stackoverflow.com/a/59005942/4242747
       })
 
