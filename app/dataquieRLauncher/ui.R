@@ -10,7 +10,7 @@
 library(shiny)
 library(shinyjs)
 
-VERSION <- "0.1.2"
+VERSION <- "0.1.3"
 
 # Define UI for application that draws a histogram
 fillPage(
