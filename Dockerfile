@@ -1,4 +1,4 @@
-FROM r-base
+FROM r-base:4.3.2
 LABEL maintainer "Stephan Struckmann <stephan.struckmann@uni-greifswald.de>"
 
 # Support docker build . --build-arg version=2.0.1
