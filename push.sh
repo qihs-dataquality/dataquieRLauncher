@@ -1,6 +1,6 @@
 #!/bin/bash
 dV=$(docker run --rm struckmann/dataquier-2-shiny Rscript -e 'cat(as.character(packageVersion("dataquieR"))); cat("\n")')
-lV=$(Rscript -e 'suppressMessages(source("app/dataquieRLauncher/ui.R")); cat(VERSION); cat("\n")')
+lV=$(docker run --rm struckmann/dataquier-2-shiny Rscript -e 'suppressMessages(source("/root/app/dataquieRLauncher/ui.R")); cat(VERSION); cat("\n")')
 V=${dV}_${lV}
 echo $V
 

@@ -34,6 +34,9 @@ RUN apt-get update && apt-get install -y \
     tcl-dev tk-dev
 RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
 
+RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org/')"
+
+
 # install desired version of dataquieR
 RUN R -e "if (nzchar(Sys.getenv('version'))) { \
             remotes::install_version('dataquieR', version=Sys.getenv('version'), upgrade='always', dependencies=TRUE, repos=c('https://packages.qihs.uni-greifswald.de/repository/ship-snapshot-r/', 'https://cloud.r-project.org/')) \
