@@ -1,4 +1,4 @@
-FROM r-base:4.3.2
+FROM rocker/verse:latest-daily
 LABEL maintainer "Stephan Struckmann <stephan.struckmann@uni-greifswald.de>"
 
 # Support docker build . --build-arg version=2.0.1
@@ -39,6 +39,8 @@ RUN apt-get update && apt-get install -y \
 
 RUN R -e "install.packages('units', repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
+
+ADD https://packages.qihs.uni-greifswald.de/service/rest/repository/browse/ship-snapshot-r/src/contrib/dataquieR/$version/ /root/version
 
 # install desired version of dataquieR
 RUN R -e "if (nzchar(Sys.getenv('version'))) { \
