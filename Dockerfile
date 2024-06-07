@@ -64,4 +64,4 @@ COPY Rprofile.site /usr/lib/R/etc/
 
 EXPOSE 3838
 
-CMD ["R", "-e", "shiny::runApp('/root/app/dataquieRLauncher')"]
+CMD ["R", "-e", "shiny::runApp('/root/app/dataquieRLauncher', port=3838, host='0.0.0.0')"]
