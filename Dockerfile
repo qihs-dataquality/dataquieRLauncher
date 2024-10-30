@@ -6,6 +6,8 @@ LABEL maintainer "Stephan Struckmann <stephan.struckmann@uni-greifswald.de>"
 # this file will be installed as a latest step.
 ARG BUILD_ENV=version
 
+ENV PLATFORM="docker"
+
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
     libcurl4-gnutls-dev \
@@ -28,6 +30,9 @@ RUN R -e "install.packages(c('shiny', 'plumber'), repos='https://cloud.r-project
 RUN R -e "install.packages(c('shiny.info', 'shinyjs', 'callr', 'htmltools', 'plumber'), repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages(c('DT'), repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('markdown', repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages('dbx', repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages('RMySQL', repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages('urltools', repos='https://cloud.r-project.org/')"
 
 # for summarytools
 RUN apt-get update && apt-get install -y \
