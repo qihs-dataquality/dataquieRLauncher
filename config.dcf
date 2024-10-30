@@ -1,0 +1,4 @@
+study_data: study_data
+meta_data_v2: meta_data_v2
+output_dir: /tmp/test
+label_col: LABEL
