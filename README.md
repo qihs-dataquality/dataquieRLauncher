@@ -60,3 +60,6 @@ For adding `dataquieR 2.0.1` to a `shinyproxy` server, add something like below 
       container-image: dataquality/dataquier:latest
       access-groups: [developers]
 ```
+
+Hint: Use `proxy.container-log-path: ./container-logs` in ShinyProxy to store
+container logs.
