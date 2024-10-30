@@ -356,72 +356,77 @@ function(input, output, session) {
 
   })
 
-}
+  #### test db connection ####
 
+  # db_username: ...
+  # db_password: ...
+  # db_url <- "host.docker.internal"
+  # db_url <- "localhost"
 
-# db_username: ...
-# db_password: ...
-# db_url <- "host.docker.internal"
-# db_url <- "localhost"
+  db_name <- as.character(Sys.getenv("db_name", unset = "mysql"))
+  db_username <- as.character(Sys.getenv("db_username", unset = "mysql"))
+  db_password <- as.character(Sys.getenv("db_password", unset = ""))
+  db_port <- as.character(Sys.getenv("db_port", unset = "3306"))
+  db_adapter <- as.character(Sys.getenv("db_adapter", unset = "mysql"))
+  db_url <- as.character(Sys.getenv("db_url", unset = ""))
 
-db_name <- as.character(Sys.getenv("db_name", unset = "mysql"))
-db_username <- as.character(Sys.getenv("db_username", unset = "mysql"))
-db_password <- as.character(Sys.getenv("db_password", unset = ""))
-db_port <- as.character(Sys.getenv("db_port", unset = "3306"))
-db_adapter <- as.character(Sys.getenv("db_adapter", unset = "mysql"))
-db_url <- as.character(Sys.getenv("db_url", unset = ""))
-
-if (nzchar(db_url)) {
-  params <- list(
-    user = db_username,
-    password = db_password,
-    host = db_url,
-    adapter = db_adapter,
-    dbname = db_name,
-    port = as.integer(db_port)
-  )
-  if (grepl(":", db_url, fixed = TRUE)) { # a url, not a hostname; : is not allowed in hostnames
-    uri <- urltools::url_parse(db_url)
-    creds <- urltools::get_credentials(db_url)
-    adapter <- uri$scheme
-    if (is.na(adapter)) {
-      stop(sprintf("Invalid db_url: %s", sQuote(db_url)))
-    }
-    params$dbname <- uri$path
-    if (!is.na(uri$domain)) {
-      params$host <- uri$domain
-    }
-    if (!is.na(uri$port)) {
-      params$port <- as.integer(uri$port)
-    }
-    if (!is.na(creds$username)) {
-      params$user <- creds$username
-    }
-    if (!is.na(creds$authentication)) {
-      params$password <- creds$authentication
-    }
-  }
-  conn <- NULL
-  try({
-    if (params$host == "localhost") {
-      if (Sys.getenv("PLATFORM") == "docker") { # from DOCKERFILE
-        params$host <- "host.docker.internal" # DB runs likely on host
-      } else { # don't use localhost, that triggers to use sockets
-        params$host <- "127.0.0.1"
+  if (nzchar(db_url)) {
+    params <- list(
+      user = db_username,
+      password = db_password,
+      host = db_url,
+      adapter = db_adapter,
+      dbname = db_name,
+      port = as.integer(db_port)
+    )
+    if (grepl(":", db_url, fixed = TRUE)) { # a url, not a hostname; : is not allowed in hostnames
+      uri <- urltools::url_parse(db_url)
+      creds <- urltools::get_credentials(db_url)
+      adapter <- uri$scheme
+      if (is.na(adapter)) {
+        stop(sprintf("Invalid db_url: %s", sQuote(db_url)))
+      }
+      params$dbname <- uri$path
+      if (!is.na(uri$domain)) {
+        params$host <- uri$domain
+      }
+      if (!is.na(uri$port)) {
+        params$port <- as.integer(uri$port)
+      }
+      if (!is.na(creds$username)) {
+        params$user <- creds$username
+      }
+      if (!is.na(creds$authentication)) {
+        params$password <- creds$authentication
       }
     }
-    conn <- do.call(dbx::dbxConnect, params)
-    stmt <- "SELECT TABLE_NAME
+    conn <- NULL
+    try({
+      if (params$host == "localhost") {
+        if (Sys.getenv("PLATFORM") == "docker") { # from DOCKERFILE
+          params$host <- "host.docker.internal" # DB runs likely on host
+        } else { # don't use localhost, that triggers to use sockets
+          params$host <- "127.0.0.1"
+        }
+      }
+      conn <- do.call(dbx::dbxConnect, params)
+      stmt <- "SELECT TABLE_NAME
            FROM INFORMATION_SCHEMA.TABLES
            WHERE TABLE_TYPE = 'BASE TABLE'"
-    df_tables <- dbxSelect(conn, stmt)
-    df_ordered <- df_tables[order(df_tables$TABLE_NAME), , drop = FALSE]
-    dataquieR:::util_message("Have the following tables: %s",
-                             dataquieR:::util_pretty_vector_string(
-                               df_ordered$TABLE_NAME))
+      df_tables <- dbxSelect(conn, stmt)
+      df_ordered <- df_tables[order(df_tables$TABLE_NAME), , drop = FALSE]
+      dataquieR:::util_message("Have the following tables: %s",
+                               dataquieR:::util_pretty_vector_string(
+                                 df_ordered$TABLE_NAME))
 
-  })
-  if (!is.null(conn)) {
-    try(dbx::dbxDisconnect(conn), silent = TRUE)
+    })
+    if (!is.null(conn)) {
+      try(dbx::dbxDisconnect(conn), silent = TRUE)
+    }
+  } else {
+    dataquieR:::util_message("No db_url in environment variables")
   }
+
+
+  #### end test db connection ####
 }
