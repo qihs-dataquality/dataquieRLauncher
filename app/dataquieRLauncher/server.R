@@ -10,6 +10,9 @@
 library(shiny)
 library(shinyjs)
 
+library(RMySQL)
+library(RPostgres)
+
 # Define server logic required to draw a histogram
 function(input, output, session) {
 
@@ -413,7 +416,7 @@ function(input, output, session) {
       stmt <- "SELECT TABLE_NAME
            FROM INFORMATION_SCHEMA.TABLES
            WHERE TABLE_TYPE = 'BASE TABLE'"
-      df_tables <- dbxSelect(conn, stmt)
+      df_tables <- dbx::dbxSelect(conn, stmt)
       df_ordered <- df_tables[order(df_tables$TABLE_NAME), , drop = FALSE]
       dataquieR:::util_message("Have the following tables: %s",
                                dataquieR:::util_pretty_vector_string(

@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libssh2-1-dev \
     libsodium-dev \
+    libpq-dev \
     cmake
 
 # system library dependency for the euler app
@@ -33,6 +34,7 @@ RUN R -e "install.packages('markdown', repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('dbx', repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('RMySQL', repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('urltools', repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages('RPostgres', repos='https://cloud.r-project.org/')"
 
 # for summarytools
 RUN apt-get update && apt-get install -y \
