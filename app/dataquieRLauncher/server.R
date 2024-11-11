@@ -447,7 +447,7 @@ function(input, output, session) {
 
   if (useDB) {
 
-    conn <- NULL
+    con <- NULL
     try({
       con <- do.call(dbx::dbxConnect, db_connection_params)
       stmt <- "select table_schema || '.' || table_name as found_tables
