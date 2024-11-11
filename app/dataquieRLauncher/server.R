@@ -16,6 +16,12 @@ library(RPostgres)
 # Define server logic required to draw a histogram
 function(input, output, session) {
 
+  # flag to activate DB access; if false, ignore all db relevant code
+  # this may be the case when a study_data and meta_data file is uploaded
+  # TODO: implement here how to set the useDB flag, e.g. by existence of
+  #       such a system parameter like db_url?
+  useDB <- TRUE
+
   shinyjs::runjs('$("#dims [value=int]").attr("disabled", true)')
   shinyjs::hide("download_report")
 
@@ -80,6 +86,54 @@ function(input, output, session) {
     contentType = "application/zip"
   )
 
+  if (useDB) {
+
+    db_connection_params <- list(
+      user = as.character(Sys.getenv("db_username", unset = "mysql")),
+      password = as.character(Sys.getenv("db_password", unset = "")),
+      host = as.character(Sys.getenv("db_url", unset = "")),
+      adapter = as.character(Sys.getenv("db_adapter", unset = "mysql")),
+      dbname = as.character(Sys.getenv("db_name", unset = "mysql")),
+      port = as.integer(as.character(Sys.getenv("db_port", unset = "3306")))
+    )
+
+    if (nzchar(db_connection_params$host)) {
+      if (grepl(":", db_connection_params$host, fixed = TRUE)) { # a url, not a hostname; : is not allowed in hostnames
+        uri <- urltools::url_parse(db_connection_params$host)
+        creds <- urltools::get_credentials(db_connection_params$host)
+        adapter <- uri$scheme
+        if (is.na(db_connection_params$adapter)) {
+          stop(sprintf("Invalid db_url: %s", sQuote(db_connection_params$host)))
+        }
+        db_connection_params$dbname <- uri$path
+        if (!is.na(uri$domain)) {
+          db_connection_params$host <- uri$domain
+        }
+        if (!is.na(uri$port)) {
+          db_connection_params$port <- as.integer(uri$port)
+        }
+        if (!is.na(creds$username)) {
+          db_connection_params$user <- creds$username
+        }
+        if (!is.na(creds$authentication)) {
+          db_connection_params$password <- creds$authentication
+        }
+      }
+      if (db_connection_params$host == "localhost") {
+        if (Sys.getenv("PLATFORM") == "docker") { # from DOCKERFILE
+          db_connection_params$host <- "host.docker.internal" # DB runs likely on host
+        } else { # don't use localhost, that triggers to use sockets
+          db_connection_params$host <- "127.0.0.1"
+        }
+      }
+    } else {
+      dataquieR:::util_message("No db_url in environment variables")
+    }
+  }
+  else {
+    db_connection_params <- list()
+  }
+
   # https://www.r-bloggers.com/2020/04/asynchronous-background-execution-in-shiny-using-callr/
   long_run <- eventReactive(input$run, {
     if (is.null(input$meta_data) ||
@@ -126,7 +180,7 @@ function(input, output, session) {
       stderr = "",
       stdout = "",
       wd = d,
-      func = function(study_data, meta_data, d, dims) {
+      func = function(study_data, meta_data, d, dims, db_connection_params) {
         library(dataquieR)
         # see https://stackoverflow.com/a/34520450/4242747 -- which,
         # unfortunately still is the trueth (June, 1st of 2023, STS)
@@ -157,8 +211,37 @@ function(input, output, session) {
             tryInvokeRestart("muffleMessage")
           },
           expr = {
-            if (is.null(meta_data))
+            if (is.null(meta_data)) {
               meta_data <- formals(function(x){})[["x"]] # tweak to save missing argument explicitly
+            }
+
+            if (useDB) {
+              # for debug only
+#              db_connection_params <- list(
+#                user = "nako",
+#                password = "nako",
+#                host = "localhost",
+#                adapter = "postgresql",
+#                dbname = "nakodata",
+#                port = 5432
+#              )
+
+              # load data from the database
+              con <- do.call(dbx::dbxConnect, db_connection_params)
+              schemaname <- as.character(Sys.getenv("db_schema", unset = "public"))
+              # TODO: get table names from the metadata file
+              tablenames <- c('t_handkraft', 't_gewicht')
+              list_of_dataframes <- lapply(tablenames, function(tablename){
+                dbx::dbxSelect(con, sprintf("select * from %s.%s", schemaname, tablename))
+              })
+              dbx::dbxDisconnect(con)
+
+              # merge loaded data
+              study_data <- Reduce(function(x, y){
+                merge(x, y, all = TRUE, by = c("id_prob", "id_untw"))
+              }, list_of_dataframes)
+            }
+
             error <- try(report <- dataquieR::dq_report2(study_data = study_data,
                                                          meta_data_v2 = meta_data,
                                                          dimensions = dims), silent = TRUE)
@@ -202,10 +285,11 @@ function(input, output, session) {
         )
         file.exists(file.path(d, "renderinfo.json")) # one of the last files written
       },
-      args = list(study_data = input$study_data$datapath,
-                       meta_data = md,
-                       d = file.path(getwd(), d),
-                  dims = input$dims),
+      args = list(study_data           = input$study_data$datapath,
+                  meta_data            = md,
+                  d                    = file.path(getwd(), d),
+                  dims                 = input$dims,
+                  db_connection_params = db_connection_params),
       supervise = TRUE
     )
     e$process <- x
@@ -361,75 +445,26 @@ function(input, output, session) {
 
   #### test db connection ####
 
-  # db_username: ...
-  # db_password: ...
-  # db_url <- "host.docker.internal"
-  # db_url <- "localhost"
+  if (useDB) {
 
-  db_name <- as.character(Sys.getenv("db_name", unset = "mysql"))
-  db_username <- as.character(Sys.getenv("db_username", unset = "mysql"))
-  db_password <- as.character(Sys.getenv("db_password", unset = ""))
-  db_port <- as.character(Sys.getenv("db_port", unset = "3306"))
-  db_adapter <- as.character(Sys.getenv("db_adapter", unset = "mysql"))
-  db_url <- as.character(Sys.getenv("db_url", unset = ""))
-
-  if (nzchar(db_url)) {
-    params <- list(
-      user = db_username,
-      password = db_password,
-      host = db_url,
-      adapter = db_adapter,
-      dbname = db_name,
-      port = as.integer(db_port)
-    )
-    if (grepl(":", db_url, fixed = TRUE)) { # a url, not a hostname; : is not allowed in hostnames
-      uri <- urltools::url_parse(db_url)
-      creds <- urltools::get_credentials(db_url)
-      adapter <- uri$scheme
-      if (is.na(adapter)) {
-        stop(sprintf("Invalid db_url: %s", sQuote(db_url)))
-      }
-      params$dbname <- uri$path
-      if (!is.na(uri$domain)) {
-        params$host <- uri$domain
-      }
-      if (!is.na(uri$port)) {
-        params$port <- as.integer(uri$port)
-      }
-      if (!is.na(creds$username)) {
-        params$user <- creds$username
-      }
-      if (!is.na(creds$authentication)) {
-        params$password <- creds$authentication
-      }
-    }
     conn <- NULL
     try({
-      if (params$host == "localhost") {
-        if (Sys.getenv("PLATFORM") == "docker") { # from DOCKERFILE
-          params$host <- "host.docker.internal" # DB runs likely on host
-        } else { # don't use localhost, that triggers to use sockets
-          params$host <- "127.0.0.1"
-        }
-      }
-      conn <- do.call(dbx::dbxConnect, params)
-      stmt <- "SELECT TABLE_NAME
-           FROM INFORMATION_SCHEMA.TABLES
-           WHERE TABLE_TYPE = 'BASE TABLE'"
-      df_tables <- dbx::dbxSelect(conn, stmt)
-      df_ordered <- df_tables[order(df_tables$TABLE_NAME), , drop = FALSE]
-      dataquieR:::util_message("Have the following tables: %s",
+      con <- do.call(dbx::dbxConnect, db_connection_params)
+      stmt <- "select table_schema || '.' || table_name as found_tables
+               from information_schema.tables
+               where table_type = 'BASE TABLE'
+               and table_schema not in ('pg_catalog', 'information_schema')"
+      df_tables <- dbx::dbxSelect(con, stmt)
+      df_ordered <- df_tables[order(df_tables$found_tables), , drop = FALSE]
+      dataquieR:::util_message("Found the following data tables: %s",
                                dataquieR:::util_pretty_vector_string(
-                                 df_ordered$TABLE_NAME))
+                                 df_ordered$found_tables))
 
     })
-    if (!is.null(conn)) {
-      try(dbx::dbxDisconnect(conn), silent = TRUE)
+    if (!is.null(con)) {
+      try(dbx::dbxDisconnect(con), silent = TRUE)
     }
-  } else {
-    dataquieR:::util_message("No db_url in environment variables")
   }
-
 
   #### end test db connection ####
 }
