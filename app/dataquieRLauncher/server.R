@@ -96,6 +96,15 @@ function(input, output, session) {
       dbname = as.character(Sys.getenv("db_name", unset = "mysql")),
       port = as.integer(as.character(Sys.getenv("db_port", unset = "3306")))
     )
+    # for debug only
+    db_connection_params <- list(
+      user = "nako",
+      password = "nako",
+      host = "localhost",
+      adapter = "postgresql",
+      dbname = "nakodata",
+      port = 5430
+    )
 
     if (nzchar(db_connection_params$host)) {
       if (grepl(":", db_connection_params$host, fixed = TRUE)) { # a url, not a hostname; : is not allowed in hostnames
@@ -175,12 +184,14 @@ function(input, output, session) {
     e$wrn_shown <- list()
     e$err_shown <- list()
     e$progress$set(message = "Perparing computation...")
+    tablenames <- c('t_handkraft', 't_gewicht')
     e$mtm <- ""
     x <- callr::r_bg(
       stderr = "",
       stdout = "",
       wd = d,
-      func = function(study_data, meta_data, d, dims, db_connection_params) {
+      func = function(study_data, meta_data, d, dims, db_connection_params,
+                      useDB, tablenames) {
         library(dataquieR)
         # see https://stackoverflow.com/a/34520450/4242747 -- which,
         # unfortunately still is the trueth (June, 1st of 2023, STS)
@@ -216,21 +227,11 @@ function(input, output, session) {
             }
 
             if (useDB) {
-              # for debug only
-#              db_connection_params <- list(
-#                user = "nako",
-#                password = "nako",
-#                host = "localhost",
-#                adapter = "postgresql",
-#                dbname = "nakodata",
-#                port = 5432
-#              )
 
               # load data from the database
               con <- do.call(dbx::dbxConnect, db_connection_params)
               schemaname <- as.character(Sys.getenv("db_schema", unset = "public"))
               # TODO: get table names from the metadata file
-              tablenames <- c('t_handkraft', 't_gewicht')
               list_of_dataframes <- lapply(tablenames, function(tablename){
                 dbx::dbxSelect(con, sprintf("select * from %s.%s", schemaname, tablename))
               })
@@ -289,7 +290,9 @@ function(input, output, session) {
                   meta_data            = md,
                   d                    = file.path(getwd(), d),
                   dims                 = input$dims,
-                  db_connection_params = db_connection_params),
+                  db_connection_params = db_connection_params,
+                  useDB                = useDB,
+                  tablenames           = tablenames),
       supervise = TRUE
     )
     e$process <- x
