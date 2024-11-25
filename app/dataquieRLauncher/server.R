@@ -107,7 +107,7 @@ function(input, output, session) {
     )
 
     # for henkej only
-    db_connection_params$port <- 5432
+    # db_connection_params$port <- 5432
 
     if (nzchar(db_connection_params$host)) {
       if (grepl(":", db_connection_params$host, fixed = TRUE)) { # a url, not a hostname; : is not allowed in hostnames
