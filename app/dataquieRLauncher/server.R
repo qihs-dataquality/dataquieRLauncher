@@ -108,6 +108,9 @@ function(input, output, session) {
       port = 5430
     )
 
+    # for henkej only
+    # db_connection_params$port <- 5432
+
     if (nzchar(db_connection_params$host)) {
       if (grepl(":", db_connection_params$host, fixed = TRUE)) { # a url, not a hostname; : is not allowed in hostnames
         uri <- urltools::url_parse(db_connection_params$host)
@@ -186,7 +189,7 @@ function(input, output, session) {
     e$wrn_shown <- list()
     e$err_shown <- list()
     e$progress$set(message = "Perparing computation...")
-    tablenames <- c('t_handkraft', 't_gewicht')
+    tablenames <- input$tables
     e$mtm <- ""
     x <- callr::r_bg(
       stderr = "",
@@ -456,7 +459,7 @@ function(input, output, session) {
     con <- NULL
     try({
       con <- do.call(dbx::dbxConnect, db_connection_params)
-      stmt <- "select table_schema || '.' || table_name as found_tables
+      stmt <- "select table_name as found_tables
                from information_schema.tables
                where table_type = 'BASE TABLE'
                and table_schema not in ('pg_catalog', 'information_schema')"
@@ -465,7 +468,11 @@ function(input, output, session) {
       dataquieR:::util_message("Found the following data tables: %s",
                                dataquieR:::util_pretty_vector_string(
                                  df_ordered$found_tables))
-
+      # add the result tables as a dropdown to the UI
+      output$tables <- renderUI({
+        selectizeInput(inputId = "tables", label = "select tables",
+                       multiple = T, choices = df_ordered)
+      })
     })
     if (!is.null(con)) {
       try(dbx::dbxDisconnect(con), silent = TRUE)

@@ -24,11 +24,14 @@ fillPage(
   shinyjs::inlineCSS("#shiny-notification-panel { top: 5px; left: 30vw; width: 40vw; }"),
   h5("dataquieRLauncher"),
   # Sidebar with a slider input for number of bins
-  flowLayout(style = "max-height: 100px; overflow: auto;",
+  flowLayout(style = "max-height: 300px; overflow: auto; padding: 4px; margin: 4px",
     # Show a plot of the generated distribution
     # Application title
-    fileInput("meta_data", "Metadata v2"),
-    fileInput("study_data", "Study Data"),
+    verticalLayout(
+      fileInput("meta_data", "Metadata v2"),
+      fileInput("study_data", "Study Data")
+    ),
+    uiOutput("tables"),
     checkboxGroupInput("dims",
                        "Dimensions",
                        inline = TRUE,
