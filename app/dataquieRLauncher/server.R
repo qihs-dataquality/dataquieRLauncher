@@ -7,6 +7,8 @@
 #    http://shiny.rstudio.com/
 #
 
+options(rio.import.trust = FALSE) # security
+
 library(shiny)
 library(shinyjs)
 
@@ -124,6 +126,7 @@ function(input, output, session) {
       stdout = "",
       wd = d,
       func = function(study_data, meta_data, d, dims) {
+        options(rio.import.trust = FALSE) # security
         library(dataquieR)
         # see https://stackoverflow.com/a/34520450/4242747 -- which,
         # unfortunately still is the trueth (June, 1st of 2023, STS)
