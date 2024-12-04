@@ -9,11 +9,15 @@
 
 options(rio.import.trust = FALSE) # security
 
+library(htmltools)
+
 library(shiny)
 library(shinyjs)
 
 library(RMySQL)
 library(RPostgres)
+
+source("ui_template.R")
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
@@ -24,7 +28,7 @@ function(input, output, session) {
   #       such a system parameter like db_url?
   useDB <- TRUE
 
-  shinyjs::runjs('$("#dims [value=int]").attr("disabled", true)')
+  shinyjs::hide("show_preferences")
   shinyjs::hide("download_report")
 
   my_basedir <- getwd()
@@ -109,7 +113,7 @@ function(input, output, session) {
     )
 
     # for henkej only
-    # db_connection_params$port <- 5432
+    db_connection_params$port <- 5432
 
     if (nzchar(db_connection_params$host)) {
       if (grepl(":", db_connection_params$host, fixed = TRUE)) { # a url, not a hostname; : is not allowed in hostnames
@@ -169,6 +173,7 @@ function(input, output, session) {
     }
     shinyjs::show("cancel")
     shinyjs::hide("run")
+    shiny::removeModal()
     if (!is.null(e$progress)) {
       e$progress$close()
       e$progress <- NULL
@@ -395,6 +400,7 @@ function(input, output, session) {
       shinyjs::show("run")
       shinyjs::hide("cancel")
       shinyjs::show("download_report")
+      shinyjs::show("show_preferences")
     } else if (long_run()$is_alive()) {
       # perform all IPC via files to avoid fiddling aroudn with pipes
       progress <- suppressWarnings(try(readLines(file.path(getwd(), d, "progress"))[[1]], silent = TRUE))
@@ -480,4 +486,14 @@ function(input, output, session) {
   }
 
   #### end test db connection ####
+
+  observeEvent(input$show_preferences, {
+    showModal(popup)
+  })
+
+  observeEvent(session$clientData, {
+    # by default, show the options modal AFTER rendering the basic GUI
+    showModal(popup)
+  })
+
 }
