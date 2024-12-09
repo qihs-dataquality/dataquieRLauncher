@@ -1,5 +1,5 @@
 FROM rocker/verse:latest-daily
-LABEL maintainer "Stephan Struckmann <stephan.struckmann@uni-greifswald.de>"
+LABEL maintainer="Stephan Struckmann <stephan.struckmann@uni-greifswald.de>"
 
 # Support docker build . --build-arg version=2.0.1
 # Note: If a file dataquieR.tar.gz exists in the docker build context root,
