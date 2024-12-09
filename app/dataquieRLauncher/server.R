@@ -95,25 +95,25 @@ function(input, output, session) {
   if (useDB) {
 
     db_connection_params <- list(
-      user = as.character(Sys.getenv("db_username", unset = "mysql")),
-      password = as.character(Sys.getenv("db_password", unset = "")),
-      host = as.character(Sys.getenv("db_url", unset = "")),
-      adapter = as.character(Sys.getenv("db_adapter", unset = "mysql")),
-      dbname = as.character(Sys.getenv("db_name", unset = "mysql")),
-      port = as.integer(as.character(Sys.getenv("db_port", unset = "3306")))
+      user = as.character(Sys.getenv("db_username", unset = "nako")),
+      password = as.character(Sys.getenv("db_password", unset = "nako")),
+      host = as.character(Sys.getenv("db_url", unset = "127.0.0.1")),
+      adapter = as.character(Sys.getenv("db_adapter", unset = "postgresql")),
+      dbname = as.character(Sys.getenv("db_name", unset = "nakodata")),
+      port = as.integer(as.character(Sys.getenv("db_port", unset = "5430")))
     )
-    # for debug only
-    db_connection_params <- list(
-      user = "nako",
-      password = "nako",
-      host = "localhost",
-      adapter = "postgresql",
-      dbname = "nakodata",
-      port = 5430
-    )
+    # # for debug only
+    # db_connection_params <- list(
+    #   user = "nako",
+    #   password = "nako",
+    #   host = "localhost",
+    #   adapter = "postgresql",
+    #   dbname = "nakodata",
+    #   port = 5430
+    # )
 
     # for henkej only
-    db_connection_params$port <- 5432
+    #db_connection_params$port <- 5432
 
     if (nzchar(db_connection_params$host)) {
       if (grepl(":", db_connection_params$host, fixed = TRUE)) { # a url, not a hostname; : is not allowed in hostnames
