@@ -94,6 +94,7 @@ function(input, output, session) {
 
   if (useDB) {
 
+    dbschemaname = as.character(Sys.getenv("db_schema", unset = "public"))
     db_connection_params <- list(
       user = as.character(Sys.getenv("db_username", unset = "nako")),
       password = as.character(Sys.getenv("db_password", unset = "nako")),
@@ -111,9 +112,9 @@ function(input, output, session) {
     #   dbname = "nakodata",
     #   port = 5430
     # )
-
-    # for henkej only
-    #db_connection_params$port <- 5432
+    #
+    # # for henkej only
+    # db_connection_params$port <- 5432
 
     if (nzchar(db_connection_params$host)) {
       if (grepl(":", db_connection_params$host, fixed = TRUE)) { # a url, not a hostname; : is not allowed in hostnames
@@ -201,7 +202,7 @@ function(input, output, session) {
       stdout = "",
       wd = d,
       func = function(study_data, meta_data, d, dims, db_connection_params,
-                      useDB, tablenames) {
+                      useDB, tablenames, dbschemaname) {
         options(rio.import.trust = FALSE) # security
         library(dataquieR)
         # see https://stackoverflow.com/a/34520450/4242747 -- which,
@@ -241,10 +242,10 @@ function(input, output, session) {
 
               # load data from the database
               con <- do.call(dbx::dbxConnect, db_connection_params)
-              schemaname <- as.character(Sys.getenv("db_schema", unset = "public"))
               # TODO: get table names from the metadata file
               list_of_dataframes <- lapply(tablenames, function(tablename){
-                dbx::dbxSelect(con, sprintf("select * from %s.%s", schemaname, tablename))
+                dbx::dbxSelect(con, sprintf("select * from %s.%s", dbschemaname,
+                                            tablename))
               })
               dbx::dbxDisconnect(con)
 
@@ -303,7 +304,8 @@ function(input, output, session) {
                   dims                 = input$dims,
                   db_connection_params = db_connection_params,
                   useDB                = useDB,
-                  tablenames           = tablenames),
+                  tablenames           = tablenames,
+                  dbschemaname         = dbschemaname),
       supervise = TRUE
     )
     e$process <- x
@@ -468,8 +470,9 @@ function(input, output, session) {
       stmt <- "select table_name as found_tables
                from information_schema.tables
                where table_type = 'BASE TABLE'
-               and table_schema not in ('pg_catalog', 'information_schema')"
-      df_tables <- dbx::dbxSelect(con, stmt)
+               and table_schema = ?"
+               # and table_schema not in ('pg_catalog', 'information_schema')"
+      df_tables <- dbx::dbxSelect(con, stmt, dbschemaname)
       df_ordered <- df_tables[order(df_tables$found_tables), , drop = FALSE]
       dataquieR:::util_message("Found the following data tables: %s",
                                dataquieR:::util_pretty_vector_string(
