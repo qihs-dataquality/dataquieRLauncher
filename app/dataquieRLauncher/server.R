@@ -8,6 +8,7 @@
 #
 
 options(rio.import.trust = FALSE) # security
+options(dataquieR.study_data_cache_max = 0) # save memory and data distribution
 
 library(htmltools)
 
@@ -257,6 +258,7 @@ function(input, output, session) {
 
             error <- try(report <- dataquieR::dq_report2(study_data = study_data,
                                                          meta_data_v2 = meta_data,
+                                                         storr_factory = prep_create_storr_factory(),
                                                          dimensions = dims), silent = TRUE)
             if (inherits(error, "try-error")) {
               cat(capture.output(traceback()),
