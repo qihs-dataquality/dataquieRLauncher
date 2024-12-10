@@ -63,6 +63,10 @@ RUN if test -e /root/dataquieR.tar.gz; then \
       R CMD INSTALL /root/dataquieR.tar.gz; \
     fi
 
+RUN R -e "install.packages('devtools', repos='https://cloud.r-project.org/')"
+RUN Rscript -e 'devtools::install_dev_deps(system.file(package = "dataquieR"), \
+                                          repos="https://cloud.r-project.org/")'
+
 # copy the app to the image
 RUN mkdir /root/app
 COPY app /root/app
