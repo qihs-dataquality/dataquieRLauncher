@@ -165,6 +165,10 @@ function(input, output, session) {
     } else {
       md <- input$meta_data$datapath
     }
+    cores <- NULL
+    if (input$parallel) {
+      cores <- input$cores
+    }
     running <- FALSE
     try({
       running <- e$process$is_alive()
@@ -198,12 +202,13 @@ function(input, output, session) {
     e$progress$set(message = "Perparing computation...")
     tablenames <- input$tables
     e$mtm <- ""
+    shinyjs::hide("show_preferences")
     x <- callr::r_bg(
       stderr = "",
       stdout = "",
       wd = d,
       func = function(study_data, meta_data, d, dims, db_connection_params,
-                      useDB, tablenames, dbschemaname) {
+                      useDB, tablenames, dbschemaname, cores) {
         options(rio.import.trust = FALSE) # security
         library(dataquieR)
         # see https://stackoverflow.com/a/34520450/4242747 -- which,
@@ -256,7 +261,8 @@ function(input, output, session) {
               }, list_of_dataframes)
             }
 
-            error <- try(report <- dataquieR::dq_report2(study_data = study_data,
+            error <- try(report <- dataquieR::dq_report2(cores = cores,
+                                                         study_data = study_data,
                                                          meta_data_v2 = meta_data,
                                                          storr_factory = prep_create_storr_factory(),
                                                          dimensions = dims), silent = TRUE)
@@ -307,7 +313,8 @@ function(input, output, session) {
                   db_connection_params = db_connection_params,
                   useDB                = useDB,
                   tablenames           = tablenames,
-                  dbschemaname         = dbschemaname),
+                  dbschemaname         = dbschemaname,
+                  cores                = cores),
       supervise = TRUE
     )
     e$process <- x
@@ -499,6 +506,14 @@ function(input, output, session) {
   observeEvent(session$clientData, {
     # by default, show the options modal AFTER rendering the basic GUI
     showModal(popup)
+  })
+
+  observeEvent(input$parallel, {
+    if (input$parallel) {
+      shinyjs::enable("cores")
+    } else {
+      shinyjs::disable("cores")
+    }
   })
 
 }
