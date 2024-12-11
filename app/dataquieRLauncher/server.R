@@ -104,18 +104,18 @@ function(input, output, session) {
       dbname = as.character(Sys.getenv("db_name", unset = "nakodata")),
       port = as.integer(as.character(Sys.getenv("db_port", unset = "5430")))
     )
-    # # for debug only
-    # db_connection_params <- list(
-    #   user = "nako",
-    #   password = "nako",
-    #   host = "localhost",
-    #   adapter = "postgresql",
-    #   dbname = "nakodata",
-    #   port = 5430
-    # )
-    #
-    # # for henkej only
-    # db_connection_params$port <- 5432
+    # for debug only
+    db_connection_params <- list(
+      user = "nako",
+      password = "nako",
+      host = "localhost",
+      adapter = "postgresql",
+      dbname = "nakodata",
+      port = 5430
+    )
+
+    # for henkej only
+    db_connection_params$port <- 5432
 
     if (nzchar(db_connection_params$host)) {
       if (grepl(":", db_connection_params$host, fixed = TRUE)) { # a url, not a hostname; : is not allowed in hostnames
@@ -179,6 +179,7 @@ function(input, output, session) {
     }
     shinyjs::show("cancel")
     shinyjs::hide("run")
+    shinyjs::hide("show_preferences")
     shiny::removeModal()
     if (!is.null(e$progress)) {
       e$progress$close()
