@@ -1,4 +1,8 @@
-FROM rocker/verse:latest-daily
+FROM registry.gitlab.com/libreumg/lib/dataqualitybase:latest
+# FROM registry.gitlab.com/libreumg/internal/dataquier_builder:latest
+# FROM registry.gitlab.com/libreumg/lib/dataqualitybase:latest
+# FROM ghcr.io/r-lib/rig/r
+# FROM rocker/verse:latest-daily
 LABEL maintainer="Stephan Struckmann <stephan.struckmann@uni-greifswald.de>"
 
 # Support docker build . --build-arg version=2.0.1
