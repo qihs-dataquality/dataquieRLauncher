@@ -1,10 +1,14 @@
-FROM rocker/verse:latest-daily
-LABEL maintainer "Stephan Struckmann <stephan.struckmann@uni-greifswald.de>"
+FROM registry.gitlab.com/libreumg/lib/dataqualitybase:latest
+# FROM registry.gitlab.com/libreumg/internal/dataquier_builder:latest
+# FROM registry.gitlab.com/libreumg/lib/dataqualitybase:latest 
+# FROM ghcr.io/r-lib/rig/r
+# FROM rocker/verse:latest-daily
+LABEL maintainer="Stephan Struckmann <stephan.struckmann@uni-greifswald.de>"
 
 # Support docker build . --build-arg version=2.0.1
 # Note: If a file dataquieR.tar.gz exists in the docker build context root,
 # this file will be installed as a latest step.
-ARG BUILD_ENV=version
+ARG version=
 
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
