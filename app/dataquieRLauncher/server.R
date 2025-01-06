@@ -179,6 +179,7 @@ function(input, output, session) {
     }
     shinyjs::show("cancel")
     shinyjs::hide("run")
+    shinyjs::hide("show_preferences")
     shiny::removeModal()
     if (!is.null(e$progress)) {
       e$progress$close()
