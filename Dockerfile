@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
     libcurl4-gnutls-dev \
     libcairo2-dev \
     libxt-dev \
-    libssl-dev=3.1.5-1.1 \
+    libssl-dev \
     libssh2-1-dev \
     libsodium-dev \
     cmake
