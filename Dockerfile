@@ -1,5 +1,5 @@
-FROM r-base:4.3.2
-LABEL maintainer "Gordon A. Shumway <alf@star-treck.melmac.gov>"
+FROM registry.gitlab.com/libreumg/lib/dataqualitybase:latest
+LABEL maintainer "Dr. Stephan Struckmann <stephan.struckmann@uni-greifswald.de>"
 
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
