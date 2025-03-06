@@ -2,6 +2,7 @@ include: https://gitlab.com/libreumg/ci-templates/-/raw/main/Kaniko.gitlab-ci.ym
 
 stages:
     - build
+    - push
     - pushNexus
 
 pushNexus:
@@ -17,3 +18,7 @@ pushNexus:
     - crane push image.tar "${CI_REGISTRY_IMAGE}:latest"
   needs:
     - build
+
+push:
+  rules: 
+    - when: never
