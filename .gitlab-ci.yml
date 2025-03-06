@@ -1,1 +1,19 @@
 include: https://gitlab.com/libreumg/ci-templates/-/raw/main/Kaniko.gitlab-ci.yml
+
+stages:
+    - build
+    - pushNexus
+
+pushNexus:
+  stage: pushNexus
+  image:
+    name: gcr.io/go-containerregistry/crane:debug
+    entrypoint: [""]
+  script:
+    - crane auth login -u "${PUBLIC_NEXUS_USER}" -p "${PUBLIC_NEXUS_PASSWORD}" "${PUBLIC_NEXUS}"
+    - crane push image.tar "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
+    - crane push image.tar "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}"
+    - crane push image.tar "${CI_REGISTRY_IMAGE}:$(date +%Y%m%d-%H%M%S)"
+    - crane push image.tar "${CI_REGISTRY_IMAGE}:latest"
+  needs:
+    - build
