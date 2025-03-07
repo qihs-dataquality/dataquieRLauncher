@@ -1,13 +1,13 @@
 include: 
     - remote: 'https://gitlab.com/libreumg/ci-templates/-/raw/docker_modular/docker_modular/kaniko_build.yml'
-    - remote: 'https://gitlab.com/libreumg/ci-template/-/raw/docker_modular/docker_modular/crane_push.yml'
+    - remote: 'https://gitlab.com/libreumg/ci-templates/-/raw/docker_modular/docker_modular/crane_push.yml'
     
 stages:
     - kaniko_build
     - crane_push
 
 variables:
-  crane_registry_user: "${PUBLIC_NEXUS_USER}"   
+  crane_registry_user: "${PUBLIC_NEXUS_USER}"  
   crane_registry_password: "${PUBLIC_NEXUS_PASSWORD}"
   crane_registry: "${PUBLIC_NEXUS}"
   kaniko_xz_image: 1
