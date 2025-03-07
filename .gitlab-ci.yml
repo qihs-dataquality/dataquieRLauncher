@@ -11,4 +11,4 @@ variables:
   crane_registry_password: "${PUBLIC_NEXUS_PASSWORD}"
   crane_registry: "${PUBLIC_NEXUS}"
   crane_registry_image: "${PUBLIC_NEXUS}:56789/ship_docker/struckmann/dataquier-2-shiny"
-  kaniko_xz_image: 1
+  kaniko_bz_image: 1
