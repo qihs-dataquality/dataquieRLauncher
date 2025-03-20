@@ -4,4 +4,7 @@ stages:
     - kaniko_build_push
 
 variables:
+    kaniko_registry: "${CI_REGISTRY}"
+    kaniko_registry_user: "${CI_REGISTRY_USER}"
+    kaniko_registry_password: "${CI_REGISTRY_PASSWORD}"
     kaniko_registry_image: "${CI_REGIRSTY_IMAGE}:latest"
