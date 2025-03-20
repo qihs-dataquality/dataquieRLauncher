@@ -4,4 +4,4 @@ stages:
     - kaniko_build_push
 
 variables:
-kaniko_registry_image: "${CI_REGIRSTY_IMAGE}:latest"
+    kaniko_registry_image: "${CI_REGIRSTY_IMAGE}:latest"
