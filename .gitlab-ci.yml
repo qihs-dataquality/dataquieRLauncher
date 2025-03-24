@@ -1,7 +1,7 @@
 include: 
-    - remote: 'https://gitlab.com/libreumg/ci-templates/-/raw/docker_modular/docker_modular/kaniko_build_push_auth.yml'    
+    - remote: 'https://gitlab.com/libreumg/ci-templates/-/raw/docker_modular/docker_modular/kaniko_build_push_auth_multi.yml'    
 stages:
-    - kaniko_build_push_auth
+    - kaniko_build_push_auth_multi
 
 variables:
   kaniko_registry_user: "${PUBLIC_NEXUS_USER}"  
