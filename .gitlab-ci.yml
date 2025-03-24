@@ -6,5 +6,5 @@ stages:
 variables:
   kaniko_registry_user: "${PUBLIC_NEXUS_USER}"  
   kaniko_registry_password: "${PUBLIC_NEXUS_PASSWORD}"
-  kaniko_registry: "${PUBLIC_NEXUS}"
+  kaniko_registry: "${PUBLIC_NEXUS}:56789"
   kaniko_registry_image: "${PUBLIC_NEXUS}:56789/ship_docker/struckmann/dataquier-2-shiny"
