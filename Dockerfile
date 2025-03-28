@@ -1,14 +1,5 @@
 FROM registry.gitlab.com/libreumg/lib/dataqualitybase:latest
-# FROM registry.gitlab.com/libreumg/internal/dataquier_builder:latest
-# FROM registry.gitlab.com/libreumg/lib/dataqualitybase:latest 
-# FROM ghcr.io/r-lib/rig/r
-# FROM rocker/verse:latest-daily
-LABEL maintainer="Stephan Struckmann <stephan.struckmann@uni-greifswald.de>"
-
-# Support docker build . --build-arg version=2.0.1
-# Note: If a file dataquieR.tar.gz exists in the docker build context root,
-# this file will be installed as a latest step.
-ARG version=
+LABEL maintainer "Dr. Stephan Struckmann <stephan.struckmann@uni-greifswald.de>"
 
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
@@ -24,27 +15,27 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get update && apt-get install -y \
     libmpfr-dev
 
-# remotes for installing specific version of dataquieR from the beta mirror
-RUN R -e "install.packages(c('remotes'), repos='https://cloud.r-project.org/')"
-
 # basic shiny functionality
 RUN R -e "install.packages(c('shiny', 'plumber'), repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages(c('shiny.info', 'shinyjs', 'callr', 'htmltools', 'plumber'), repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages(c('DT'), repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages('dataquieR', dependencies = TRUE, repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('markdown', repos='https://cloud.r-project.org/')"
 
-# for summarytools
 RUN apt-get update && apt-get install -y \
-    libmagick++-dev tcl-dev tk-dev
-
-# for units
-RUN apt-get update && apt-get install -y \
-    libudunits2-dev
-
-RUN R -e "install.packages('units', repos='https://cloud.r-project.org/')"
+    libmagick++-dev
 RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
 
-ADD https://packages.qihs.uni-greifswald.de/service/rest/repository/browse/ship-snapshot-r/src/contrib/dataquieR/$version/ /root/version
+RUN apt-get update && apt-get install -y \
+    libudunits2-dev
+RUN R -e "install.packages('units', repos='https://cloud.r-project.org/')"
+
+RUN apt-get update && apt-get install -y \
+    tcl-dev tk-dev
+RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
+
+RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org/')"
+
 
 # install desired version of dataquieR
 RUN R -e "if (nzchar(Sys.getenv('version'))) { \
@@ -68,4 +59,5 @@ COPY Rprofile.site /usr/lib/R/etc/
 
 EXPOSE 3838
 
-CMD ["R", "-e", "shiny::runApp('/root/app/dataquieRLauncher', port=3838, host='0.0.0.0')"]
+CMD ["R", "-e", "shiny::runApp('/root/app/dataquieRLauncher')"]
+# CMD ["R", "-e", "plumber::plumb(file='/root/test/plumber.R')$run(port = as.integer(eval(formals(shiny::runApp)$port)), host = eval(formals(shiny::runApp)$host), docs = TRUE, debug = FALSE, swaggerCallback = NULL)"]
