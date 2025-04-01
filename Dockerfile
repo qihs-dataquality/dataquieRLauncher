@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/libreumg/lib/dataqualitybase:latest
+FROM dataquality/dataqualitybase:latest
 LABEL maintainer "Dr. Stephan Struckmann <stephan.struckmann@uni-greifswald.de>"
 
 # system libraries of general use
