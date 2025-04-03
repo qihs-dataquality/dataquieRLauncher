@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DQ_VERSION=$(curl "https://cran.r-project.org/src/contrib" | grep --only-matching -P -m 1 -C 0 "dataquieR.+?gz" | head -n 1 - | sed -e 's/dataquieR//g' -e 's/\.tar\.gz//g')
+DQ_VERSION=$(curl -s "https://cran.r-project.org/src/contrib/" | grep --only-matching -P -m 1 -C 0 "dataquieR.+?gz" | head -n 1 - | sed -e 's/dataquieR_//g' -e 's/\.tar\.gz//g')
 
 docker tag $IMAGE_NAME $DOCKER_REPO:$DQ_VERSION
 docker push $DOCKER_REPO:$DQ_VERSION
