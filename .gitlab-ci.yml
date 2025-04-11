@@ -1,10 +1,7 @@
 include: 
-    - remote: 'https://gitlab.com/libreumg/ci-templates/-/raw/docker_modular/docker_modular/kaniko_build_push_auth_multi.yml'    
+    - remote: 'https://gitlab.com/libreumg/ci-templates/-/raw/main/kaniko/kaniko_build_push_multi.yml'    
 stages:
-    - kaniko_build_push_auth_multi
+    - kaniko_build_push_multi
 
 variables:
-  kaniko_registry_user: "${PUBLIC_NEXUS_USER}"  
-  kaniko_registry_password: "${PUBLIC_NEXUS_PASSWORD}"
-  kaniko_registry: "${PUBLIC_NEXUS}:56789"
   kaniko_registry_image: "${PUBLIC_NEXUS}:56789/ship_docker/struckmann/dataquier-2-shiny"
