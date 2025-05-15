@@ -38,16 +38,16 @@ RUN R -e "install.packages('RPostgres', repos='https://cloud.r-project.org/')"
 
 # RUN R -e 'remotes::install_github("Appsilon/shiny.info")'
 
-# for summarytools
-RUN apt-get update && apt-get install -y \
-    libmagick++-dev tcl-dev tk-dev
+## for summarytools
+#RUN apt-get update && apt-get install -y \
+#    libmagick++-dev tcl-dev tk-dev
 
 # for units
 RUN apt-get update && apt-get install -y \
     libudunits2-dev
 
 RUN R -e "install.packages('units', repos='https://cloud.r-project.org/')"
-RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
+#RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
 
 ADD https://packages.qihs.uni-greifswald.de/service/rest/repository/browse/ship-snapshot-r/src/contrib/dataquieR/$version/ /root/version
 
