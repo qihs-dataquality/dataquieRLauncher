@@ -28,13 +28,15 @@ RUN R -e "install.packages(c('remotes'), repos='https://cloud.r-project.org/')"
 
 # basic shiny functionality
 RUN R -e "install.packages(c('shiny', 'plumber'), repos='https://cloud.r-project.org/')"
-RUN R -e "install.packages(c('shiny.info', 'shinyjs', 'callr', 'htmltools', 'plumber'), repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages(c('shinyjs', 'callr', 'htmltools', 'plumber'), repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages(c('DT'), repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('markdown', repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('dbx', repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('RMySQL', repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('urltools', repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('RPostgres', repos='https://cloud.r-project.org/')"
+
+# RUN R -e 'remotes::install_github("Appsilon/shiny.info")'
 
 # for summarytools
 RUN apt-get update && apt-get install -y \
