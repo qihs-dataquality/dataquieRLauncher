@@ -3,5 +3,7 @@
 # DQ_VERSION=$(curl -s "https://cran.r-project.org/src/contrib/" | grep --only-matching -P -m 1 -C 0 "dataquieR.+?gz" | head -n 1 - | sed -e 's/dataquieR_//g' -e 's/\.tar\.gz//g')
 DQ_VERSION=$(docker run --rm $IMAGE_NAME Rscript -e 'cat(format(packageVersion("dataquieR")))')
 
+DQ_VERSION=${DQ_VERSION}_$(docker run --rm $IMAGE_NAME Rscript -e 'source("/root/app/dataquieRLauncher/ui.R"); cat(VERSION)')
+
 docker tag $IMAGE_NAME $DOCKER_REPO:$DQ_VERSION
 docker push $DOCKER_REPO:$DQ_VERSION
