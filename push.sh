@@ -6,6 +6,7 @@ echo $V
 
 docker tag struckmann/dataquier-2-shiny packages.ship-med.uni-greifswald.de:56789/ship_docker/struckmann/dataquier-2-shiny:$V
 docker push packages.ship-med.uni-greifswald.de:56789/ship_docker/struckmann/dataquier-2-shiny:$V
+
 docker tag struckmann/dataquier-2-shiny packages.ship-med.uni-greifswald.de:56789/ship_docker/struckmann/dataquier-2-shiny:latest
 docker push packages.ship-med.uni-greifswald.de:56789/ship_docker/struckmann/dataquier-2-shiny:latest
 
@@ -14,4 +15,9 @@ docker tag struckmann/dataquier-2-shiny dataquality/dataquier:$V
 docker push dataquality/dataquier:$V
 
 docker tag struckmann/dataquier-2-shiny dataquality/dataquier:latest
+
+docker tag dataquality/dataquier-2-shiny dataquality/dataquier:$V
+docker push dataquality/dataquier:$V
+
+docker tag dataquality/dataquier-2-shiny dataquality/dataquier:latest
 docker push dataquality/dataquier:latest
