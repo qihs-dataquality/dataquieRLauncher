@@ -28,7 +28,7 @@ RUN R -e "install.packages(c('remotes'), repos='https://cloud.r-project.org/')"
 
 # basic shiny functionality
 RUN R -e "install.packages(c('shiny', 'plumber'), repos='https://cloud.r-project.org/')"
-RUN R -e "install.packages(c('shiny.info', 'shinyjs', 'callr', 'htmltools', 'plumber'), repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages(c('shinyjs', 'callr', 'htmltools', 'plumber'), repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages(c('DT'), repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('markdown', repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('dbx', repos='https://cloud.r-project.org/')"
@@ -36,16 +36,18 @@ RUN R -e "install.packages('RMySQL', repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('urltools', repos='https://cloud.r-project.org/')"
 RUN R -e "install.packages('RPostgres', repos='https://cloud.r-project.org/')"
 
-# for summarytools
-RUN apt-get update && apt-get install -y \
-    libmagick++-dev tcl-dev tk-dev
+# RUN R -e 'remotes::install_github("Appsilon/shiny.info")'
+
+## for summarytools
+#RUN apt-get update && apt-get install -y \
+#    libmagick++-dev tcl-dev tk-dev
 
 # for units
 RUN apt-get update && apt-get install -y \
     libudunits2-dev
 
 RUN R -e "install.packages('units', repos='https://cloud.r-project.org/')"
-RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
+#RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
 
 ADD https://packages.qihs.uni-greifswald.de/service/rest/repository/browse/ship-snapshot-r/src/contrib/dataquieR/$version/ /root/version
 

@@ -44,7 +44,8 @@ fillPage(
       actionButton(style = "display: none; height: 80px; position: fixed; width: 200px; right: 5px; z-index: 100000; opacity: 0.8;", "cancel", "Cancel computation")
     )
   ),
-  shiny.info::version(),
-  div(style = "font-size: 10px;position:fixed; bottom:2px; height:1.2em; background-color: #bbbbbb; right:2px; z-index: -99999; color: #333333",
+  # shiny.info::version(),
+  div(style="position:fixed;top:0;right:0;z-index:9999;background-color:#f5f5f5;font-size:12px;", paste0("v", VERSION)),
+  div(style = "font-size: 10px;position:fixed; bottom:2px; height:1.2em; background-color: #f5f5f5; right:2px; z-index: -99999; color: #333333",
       paste0("dataquieR v", packageVersion("dataquieR")))
 )
