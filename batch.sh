@@ -1,5 +1,5 @@
 #!/bin/bash
 
-docker pull dataquality/dataquier:latest
+docker pull packages.ship-med.uni-greifswald.de:56789/ship_docker/dataquality/dataquier:latest
 
-docker run --rm -v "$(pwd)":/home/rstudio dataquality/dataquier:latest Rscript /home/rstudio/report.R
+docker run --rm -v /opt/dataquieR/:/home/rstudio/ packages.ship-med.uni-greifswald.de:56789/ship_docker/dataquality/dataquier:latest Rscript /home/rstudio/dataquieR/report.R
