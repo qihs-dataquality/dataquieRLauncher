@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/libreumg/lib/dataqualitybase:latest
+FROM registry.gitlab.com/libreumg/lib/dataqualitybase/next:latest
 LABEL maintainer "Stephan Struckmann <stephan.struckmann@uni-greifswald.de>"
 
 # Support docker build . --build-arg version=2.0.1
