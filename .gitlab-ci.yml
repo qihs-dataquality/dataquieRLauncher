@@ -6,5 +6,5 @@ stages:
 variables:
   kaniko_registry_user: "${user}"
   kaniko_registry_password: "${secret}"
-  kaniko_registry: "${nexus}:56789"
-  kaniko_registry_image: "${nexus}:56789/ship_docker/dataquality/dataquier"
+  kaniko_registry: "packages.ship-med.uni-greifswald.de:56789"
+  kaniko_registry_image: "packages.ship-med.uni-greifswald.de:56789/ship_docker/dataquality/dataquier"
