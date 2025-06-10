@@ -4,7 +4,7 @@ stages:
     - kaniko_build_push_auth_multi
 
 variables:
-  kaniko_registry_user: "${PUBLIC_NEXUS_USER}"
-  kaniko_registry_password: "${PUBLIC_NEXUS_PASSWORD}"
-  kaniko_registry: "${PUBLIC_NEXUS}:56789"
-  kaniko_registry_image: "${PUBLIC_NEXUS}:56789/ship_docker/dataquality/dataquier"
+  kaniko_registry_user: "${user}"
+  kaniko_registry_password: "${secret}"
+  kaniko_registry: "${nexus}:56789"
+  kaniko_registry_image: "${nexus}:56789/ship_docker/dataquality/dataquier"
