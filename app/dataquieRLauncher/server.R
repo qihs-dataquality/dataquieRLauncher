@@ -31,7 +31,7 @@ function(input, output, session) {
   if (length(dirs) > 0)
     unlink(dirs, recursive = TRUE, force = TRUE, expand = FALSE)
 
-  d <- tempfile(tmpdir = file.path("www"), ## no absolute path, otherwise, code below assuming startsWith www fails, and maybe more...
+  d <- tempfile(tmpdir = file.path("www"),
                 pattern = "tmp_rep_dir_")
   dir.create(d)
 
@@ -105,7 +105,7 @@ function(input, output, session) {
       e$progress <- NULL
     }
     try(e$process$kill_tree(), silent = TRUE)
-    if (dir.exists(d) && startsWith(d, file.path("www", "")))
+    if (dir.exists(d) && startsWith(d, file.path(my_basedir, "www", "")))
       try(unlink(file.path(d, "progress*"), recursive = TRUE, force = TRUE,
                  expand = TRUE))
     # remove all notifications, when shiny app starts, the new shiny progress
@@ -119,13 +119,14 @@ function(input, output, session) {
     e$msg_shown <- list()
     e$wrn_shown <- list()
     e$err_shown <- list()
-    e$progress$set(message = "Perparing computation...")
+    e$progress$set(message = "Preparing computation...")
     e$mtm <- ""
     x <- callr::r_bg(
       stderr = "",
       stdout = "",
       wd = d,
-      func = function(study_data, meta_data, d, dims) {
+      func = function(study_data, meta_data, d, my_basedir, dims) {
+        options(dataquieR.launcher.curr_rep_dir = d)
         options(rio.import.trust = FALSE) # security
         library(dataquieR)
         # see https://stackoverflow.com/a/34520450/4242747 -- which,
@@ -135,12 +136,19 @@ function(input, output, session) {
         # Here, we need to run the job in r_bg, so that we can cancel it from
         # the single threaded Shiny app. This requireds a specific progress
         # handler, which can now be registered for dataquieR as follows:
-        options(dataquieR.progress_fkt = function(percent, is_rstudio, is_shiny, is_cli, e) {
-          cat(as.character(percent), file = file.path(getwd(), "progress"), append = FALSE) # perform all IPC via files to avoid fiddling aroudn with pipes
-        },
-        dataquieR.progress_msg_fkt = function(status, msg = "", is_rstudio, is_shiny, e) { # TODO: split status and msg to different files
-          cat(status, msg, file = file.path(getwd(), "progress_msg"), append = FALSE) # perform all IPC via files to avoid fiddling aroudn with pipes
-        })
+        dataquieR.progress_fkt <- function(percent, is_rstudio, is_shiny, is_cli, e) {
+          d <- getOption("dataquieR.launcher.curr_rep_dir")
+          # cat(paste0("<", as.character(percent), ">\n", capture.output(rlang::trace_back())), "\n", file = "/tmp/p", append = TRUE, sep = "\n")
+          cat(as.character(percent), file = file.path(d, "progress"), append = FALSE) # perform all IPC via files to avoid fiddling aroudn with pipes
+        }
+        dataquieR.progress_msg_fkt <- function(status, msg = "", is_rstudio, is_shiny, e) { # TODO: split status and msg to different files
+          d <- getOption("dataquieR.launcher.curr_rep_dir")
+          cat(status, msg, file = file.path(d, "progress_msg"), append = FALSE) # perform all IPC via files to avoid fiddling aroudn with pipes
+        }
+        options(
+          dataquieR.progress_fkt = dataquieR.progress_fkt,
+          dataquieR.progress_msg_fkt = dataquieR.progress_msg_fkt
+        )
         withCallingHandlers(
           warning = function(w) {
             cat(paste(conditionMessage(w), collapse = " "),
@@ -179,9 +187,13 @@ function(input, output, session) {
               error <- FALSE
             }
             if (!error) {
-              if (dir.exists(d) && startsWith(d, file.path("www", "")))
+              if (dir.exists(d) && startsWith(d, file.path(my_basedir, "www", ""))) {
                 try(unlink(file.path(d, "*"), recursive = TRUE, force = TRUE,
                            expand = TRUE))
+                try(unlink(file.path(d, ".report"), recursive = TRUE,
+                           force = TRUE,
+                           expand = TRUE))
+              }
               error <- try(print(report, dir = d, view = FALSE), silent = TRUE)
               if (inherits(error, "try-error")) {
                 cat(capture.output(traceback()),
@@ -204,7 +216,8 @@ function(input, output, session) {
       },
       args = list(study_data = input$study_data$datapath,
                        meta_data = md,
-                       d = file.path(getwd(), d),
+                       d = file.path(my_basedir, d),
+                      my_basedir = my_basedir,
                   dims = input$dims),
       supervise = TRUE
     )
