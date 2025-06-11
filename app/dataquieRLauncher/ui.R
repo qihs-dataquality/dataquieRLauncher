@@ -10,14 +10,14 @@
 library(shiny)
 library(shinyjs)
 
-VERSION <- "0.1.6"
+VERSION <- "0.1.7"
 
 # Define UI for application that draws a histogram
 fillPage(
   shinyjs::useShinyjs(),
   htmlOutput(style = "min-height: 80px;", "report"),
   div(style = "height: 0px", # to make position of the siblings ignore this div
-    downloadButton(style = "position: absolute; top: 5px; right: 20px;", # but w/o chaning the height of the actual button
+    downloadButton(style = "position: absolute; top: 5px; right: 50px;", # but w/o chaning the height of the actual button
                    outputId = "download_report",
                    label = "Report")
   ),
