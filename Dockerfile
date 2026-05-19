@@ -24,17 +24,17 @@ RUN apt-get update && apt-get install -y \
     libmpfr-dev
 
 # remotes for installing specific version of dataquieR from the beta mirror
-RUN R -e "install.packages(c('remotes'), repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages(c('remotes'), repos='https://cloud.r-project.org/', lib=.Library.site)"
 
 # basic shiny functionality
-RUN R -e "install.packages(c('shiny', 'plumber'), repos='https://cloud.r-project.org/')"
-RUN R -e "install.packages(c('shinyjs', 'callr', 'htmltools', 'plumber'), repos='https://cloud.r-project.org/')"
-RUN R -e "install.packages(c('DT'), repos='https://cloud.r-project.org/')"
-RUN R -e "install.packages('markdown', repos='https://cloud.r-project.org/')"
-RUN R -e "install.packages('dbx', repos='https://cloud.r-project.org/')"
-RUN R -e "install.packages('RMySQL', repos='https://cloud.r-project.org/')"
-RUN R -e "install.packages('urltools', repos='https://cloud.r-project.org/')"
-RUN R -e "install.packages('RPostgres', repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages(c('shiny', 'plumber'), repos='https://cloud.r-project.org/', lib=.Library.site)"
+RUN R -e "install.packages(c('shinyjs', 'callr', 'htmltools', 'plumber'), repos='https://cloud.r-project.org/', lib=.Library.site)"
+RUN R -e "install.packages(c('DT'), repos='https://cloud.r-project.org/', lib=.Library.site)"
+RUN R -e "install.packages('markdown', repos='https://cloud.r-project.org/', lib=.Library.site)"
+RUN R -e "install.packages('dbx', repos='https://cloud.r-project.org/', lib=.Library.site)"
+RUN R -e "install.packages('RMySQL', repos='https://cloud.r-project.org/', lib=.Library.site)"
+RUN R -e "install.packages('urltools', repos='https://cloud.r-project.org/', lib=.Library.site)"
+RUN R -e "install.packages('RPostgres', repos='https://cloud.r-project.org/', lib=.Library.site)"
 
 # RUN R -e 'remotes::install_github("Appsilon/shiny.info")'
 
@@ -46,23 +46,23 @@ RUN R -e "install.packages('RPostgres', repos='https://cloud.r-project.org/')"
 RUN apt-get update && apt-get install -y \
     libudunits2-dev
 
-RUN R -e "install.packages('units', repos='https://cloud.r-project.org/')"
+RUN R -e "install.packages('units', repos='https://cloud.r-project.org/', lib=.Library.site)"
 #RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
 
 ADD https://packages.qihs.uni-greifswald.de/service/rest/repository/browse/ship-snapshot-r/src/contrib/dataquieR/$version/ /root/version
 
 # install desired version of dataquieR
 RUN R -e "if (nzchar(Sys.getenv('version'))) { \
-            remotes::install_version('dataquieR', version=Sys.getenv('version'), upgrade='always', dependencies=TRUE, repos=c('https://packages.qihs.uni-greifswald.de/repository/ship-snapshot-r/', 'https://cloud.r-project.org/')) \
+            remotes::install_version('dataquieR', version=Sys.getenv('version'), upgrade='always', dependencies=TRUE, repos=c('https://packages.qihs.uni-greifswald.de/repository/ship-snapshot-r/', 'https://cloud.r-project.org/'), lib=.Library.site) \
           } else { \
-            remotes::install_version('dataquieR', upgrade='always', dependencies=TRUE, repos=c('https://packages.qihs.uni-greifswald.de/repository/ship-snapshot-r/', 'https://cloud.r-project.org/')) \
+            remotes::install_version('dataquieR', upgrade='always', dependencies=TRUE, repos=c('https://packages.qihs.uni-greifswald.de/repository/ship-snapshot-r/', 'https://cloud.r-project.org/'), lib=.Library.site) \
           }"
 
 # If dataquieR.tar.gz exists, use this version
 # https://stackoverflow.com/a/46801962
 COPY LICENSE dataquieR.tar.g[z] /root/
 RUN if test -e /root/dataquieR.tar.gz; then \
-      R CMD INSTALL /root/dataquieR.tar.gz; \
+      R CMD INSTALL -l "$(Rscript -e 'cat(.Library.site[1L])')" /root/dataquieR.tar.gz; \
     fi
 
 # copy the app to the image and run it as an unprivileged user
