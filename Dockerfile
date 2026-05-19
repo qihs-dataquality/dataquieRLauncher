@@ -65,12 +65,21 @@ RUN if test -e /root/dataquieR.tar.gz; then \
       R CMD INSTALL /root/dataquieR.tar.gz; \
     fi
 
-# copy the app to the image
-RUN mkdir /root/app
-COPY app /root/app
+# copy the app to the image and run it as an unprivileged user
+RUN groupadd --gid 10001 dataquier \
+    && useradd --uid 10001 --gid dataquier --home-dir /home/dataquier --create-home --shell /usr/sbin/nologin dataquier \
+    && mkdir -p /opt/dataquieRLauncher \
+    && chown -R dataquier:dataquier /opt/dataquieRLauncher /home/dataquier
+COPY --chown=dataquier:dataquier app/dataquieRLauncher /opt/dataquieRLauncher
 
 COPY Rprofile.site /usr/lib/R/etc/
 
+ENV HOME=/home/dataquier \
+    TMPDIR=/tmp
+
+USER 10001:10001
+WORKDIR /opt/dataquieRLauncher
+
 EXPOSE 3838
 
-CMD ["R", "-e", "shiny::runApp('/root/app/dataquieRLauncher', port=3838, host='0.0.0.0')"]
+CMD ["R", "-e", "shiny::runApp('/opt/dataquieRLauncher', port=3838, host='0.0.0.0')"]
