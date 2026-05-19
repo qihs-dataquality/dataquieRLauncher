@@ -1,9 +1,17 @@
 #!/bin/bash
+set -euo pipefail
 
 # DQ_VERSION=$(curl -s "https://cran.r-project.org/src/contrib/" | grep --only-matching -P -m 1 -C 0 "dataquieR.+?gz" | head -n 1 - | sed -e 's/dataquieR_//g' -e 's/\.tar\.gz//g')
 DQ_VERSION=$(docker run --rm $IMAGE_NAME Rscript -e 'cat(format(packageVersion("dataquieR")))')
+UI_VERSION=$(sed -n -E 's/^VERSION[[:space:]]*<-[[:space:]]*"([^"]+)".*/\1/p' app/dataquieRLauncher/ui.R)
 
-DQ_VERSION=${DQ_VERSION}_$(docker run --rm $IMAGE_NAME Rscript -e 'source("/opt/dataquieRLauncher/ui.R"); cat(VERSION)')
+if [[ -z "${DQ_VERSION}" || -z "${UI_VERSION}" ]]; then
+  echo "Could not determine tag versions: dataquieR='${DQ_VERSION}', launcher='${UI_VERSION}'" >&2
+  exit 1
+fi
+
+DQ_VERSION=${DQ_VERSION}_${UI_VERSION}
+echo "Tagging ${IMAGE_NAME} as ${DOCKER_REPO}:${DQ_VERSION}"
 
 docker tag $IMAGE_NAME $DOCKER_REPO:$DQ_VERSION
 docker push $DOCKER_REPO:$DQ_VERSION
