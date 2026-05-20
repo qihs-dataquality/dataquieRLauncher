@@ -60,3 +60,17 @@ For adding `dataquieR 2.0.1` to a `shinyproxy` server, add something like below 
       container-image: dataquality/dataquier:latest
       access-groups: [developers]
 ```
+
+For bare-metal ShinyProxy installations with the Docker backend, keep the
+container's writable home and temporary directory intact:
+
+```yaml
+      container-env:
+        HOME: /home/dataquier
+        TMPDIR: /home/dataquier/tmp
+```
+
+The image creates `/home/dataquier/tmp` for the unprivileged container user
+`10001:10001`. Do not override `TMPDIR` with a read-only host mount or with a
+path that user `10001` cannot write to; otherwise R can fail at startup with
+`Fatal error: cannot create 'R_TempDir'`.

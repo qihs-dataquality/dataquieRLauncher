@@ -9,7 +9,8 @@ ARG BUILD_ENV=version
 ENV PLATFORM="docker"
 
 # system libraries of general use
-RUN apt-get update && apt-get install -y \
+RUN apt-get clean && rm -rf /var/cache/apt/archives/* \
+    && apt-get update && apt-get install -y --no-install-recommends \
     libcurl4-gnutls-dev \
     libcairo2-dev \
     libxt-dev \
@@ -17,11 +18,14 @@ RUN apt-get update && apt-get install -y \
     libssh2-1-dev \
     libsodium-dev \
     libpq-dev \
-    cmake
+    cmake \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # system library dependency for the euler app
-RUN apt-get update && apt-get install -y \
-    libmpfr-dev
+RUN apt-get clean && rm -rf /var/cache/apt/archives/* \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    libmpfr-dev \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 # remotes for installing specific version of dataquieR from the beta mirror
 RUN R -e "install.packages(c('remotes'), repos='https://cloud.r-project.org/', lib=.Library.site)"
@@ -43,8 +47,10 @@ RUN R -e "install.packages('RPostgres', repos='https://cloud.r-project.org/', li
 #    libmagick++-dev tcl-dev tk-dev
 
 # for units
-RUN apt-get update && apt-get install -y \
-    libudunits2-dev
+RUN apt-get clean && rm -rf /var/cache/apt/archives/* \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    libudunits2-dev \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 RUN R -e "install.packages('units', repos='https://cloud.r-project.org/', lib=.Library.site)"
 #RUN R -e "install.packages('summarytools', repos='https://cloud.r-project.org/')"
@@ -68,14 +74,15 @@ RUN if test -e /root/dataquieR.tar.gz; then \
 # copy the app to the image and run it as an unprivileged user
 RUN groupadd --gid 10001 dataquier \
     && useradd --uid 10001 --gid dataquier --home-dir /home/dataquier --create-home --shell /usr/sbin/nologin dataquier \
-    && mkdir -p /opt/dataquieRLauncher \
-    && chown -R dataquier:dataquier /opt/dataquieRLauncher /home/dataquier
+    && mkdir -p /opt/dataquieRLauncher /home/dataquier/tmp \
+    && chown -R dataquier:dataquier /opt/dataquieRLauncher /home/dataquier \
+    && chmod 700 /home/dataquier/tmp
 COPY --chown=dataquier:dataquier app/dataquieRLauncher /opt/dataquieRLauncher
 
 COPY Rprofile.site /usr/lib/R/etc/
 
 ENV HOME=/home/dataquier \
-    TMPDIR=/tmp
+    TMPDIR=/home/dataquier/tmp
 
 USER 10001:10001
 WORKDIR /opt/dataquieRLauncher
