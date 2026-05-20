@@ -61,14 +61,9 @@ For adding `dataquieR 2.0.1` to a `shinyproxy` server, add something like below 
       access-groups: [developers]
 ```
 
-For bare-metal ShinyProxy installations with the Docker backend, keep the
-container's writable home and temporary directory intact:
-
-```yaml
-      container-env:
-        HOME: /home/dataquier
-        TMPDIR: /home/dataquier/tmp
-```
+For bare-metal ShinyProxy installations with the Docker backend, the image
+already sets `HOME=/home/dataquier` and `TMPDIR=/home/dataquier/tmp`.
+ShinyProxy does not need to set these variables explicitly.
 
 The image creates `/home/dataquier/tmp` for the unprivileged container user
 `10001:10001`. Do not override `TMPDIR` with a read-only host mount or with a
